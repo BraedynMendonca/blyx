@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Blyx — Grow a tree, grow your focus</title>
+    <link rel="stylesheet" href="./styles/global.css" />
+  </head>
+  <body data-theme="forest">
+    <div class="app-shell">
+      <div id="ambient-indicator" class="ambient-indicator" aria-hidden="true"></div>
+      <header class="header-bar">
+        <div class="header-left">
+          <h1 class="logo">Blyx</h1>
+          <p class="header-date" id="header-date"></p>
+        </div>
+        <div class="header-center">
+          <div class="clock" id="header-clock">--:--</div>
+          <div class="session-state" id="session-state">Idle</div>
+        </div>
+        <div class="header-controls">
+          <label class="visually-hidden" for="preset-select">Focus duration</label>
+          <select id="preset-select">
+            <option value="25">25 min</option>
+            <option value="45">45 min</option>
+            <option value="60">60 min</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input
+            id="custom-duration"
+            type="number"
+            min="5"
+            max="180"
+            step="5"
+            placeholder="Custom"
+            aria-label="Custom duration in minutes"
+            class="hidden"
+          />
+          <button id="start-session" class="cta">Plant a tree</button>
+          <button id="pause-session" class="ghost" disabled>Pause</button>
+          <button id="abort-session" class="ghost danger" disabled>End</button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <div class="column left">
+          <section class="card spotify" aria-label="Spotify controls">
+            <header>
+              <h2>Spotify</h2>
+              <span class="hint">Ambient focus</span>
+            </header>
+            <p class="muted">Connect your Spotify device to control playback without leaving Blyx.</p>
+            <button type="button" class="ghost" id="connect-spotify">Connect Spotify</button>
+            <div class="spotify-controls" id="spotify-controls" hidden>
+              <button type="button" data-action="prev">Prev</button>
+              <button type="button" data-action="toggle">Play/Pause</button>
+              <button type="button" data-action="next">Next</button>
+            </div>
+          </section>
+
+          <section class="card weather" aria-label="Weather">
+            <header>
+              <h2>Weather</h2>
+              <span class="hint">Stay prepared</span>
+            </header>
+            <form id="weather-form">
+              <label class="visually-hidden" for="zip-input">ZIP code</label>
+              <input id="zip-input" type="text" inputmode="numeric" placeholder="ZIP code" maxlength="10" />
+              <button type="submit" class="ghost">Update</button>
+            </form>
+            <div class="weather-info">
+              <div id="weather-temp">--°F</div>
+              <div id="weather-condition" class="muted">Weather paused</div>
+            </div>
+            <p id="weather-error" class="error" hidden></p>
+          </section>
+
+          <section class="card quick-tools" aria-label="Quick tools">
+            <header>
+              <h2>Quick tools</h2>
+            </header>
+            <div class="tool-grid">
+              <button type="button" id="open-calculator">Calculator</button>
+              <button type="button" id="focus-notebook">Notebook</button>
+              <button type="button" id="focus-summarizer">Summarizer</button>
+            </div>
+          </section>
+
+          <section class="card theme-picker" aria-label="Theme picker">
+            <header>
+              <h2>Theme</h2>
+            </header>
+            <div class="theme-swatches" id="theme-swatches"></div>
+            <div class="theme-toggles">
+              <label><input type="checkbox" id="toggle-reduced-motion" /> Reduced motion</label>
+              <label><input type="checkbox" id="toggle-dyslexia" /> Dyslexia-friendly font</label>
+              <label><input type="checkbox" id="toggle-quotes" checked /> Quotes ticker</label>
+            </div>
+          </section>
+
+          <section class="card add-widget" aria-label="Add widget">
+            <header>
+              <h2>Add widget</h2>
+            </header>
+            <p class="muted">Stay tuned—more focus helpers are on the way.</p>
+          </section>
+        </div>
+
+        <div class="column center">
+          <section class="card focus" aria-label="Focus timer">
+            <header>
+              <h2>Focus session</h2>
+              <span class="badge" id="focus-status">Idle</span>
+            </header>
+            <div class="timer-display" id="timer-display">00:00</div>
+            <progress id="timer-progress" max="100" value="0">0%</progress>
+            <p class="muted" id="timer-message">Select a duration and plant your focus tree.</p>
+          </section>
+
+          <section class="card tree" aria-label="Tree visualizer">
+            <header>
+              <h2>Your tree</h2>
+              <span class="hint" id="tree-stage">Seedling</span>
+            </header>
+            <div class="tree-visual" id="tree-visual"></div>
+          </section>
+
+          <section class="card quotes" aria-label="Inspirational quotes">
+            <header>
+              <h2>Quote ticker</h2>
+              <button type="button" class="ghost" id="toggle-quote-visibility">Pause</button>
+            </header>
+            <div class="quote-ticker" id="quote-ticker"></div>
+          </section>
+
+          <section class="card forest" aria-label="Today's forest">
+            <header>
+              <h2>Today's forest</h2>
+            </header>
+            <div id="forest-grid" class="forest-grid"></div>
+          </section>
+        </div>
+
+        <div class="column right">
+          <section class="card chatbot" aria-label="AI chatbot">
+            <header>
+              <h2>AI Chatbot</h2>
+              <span class="hint">Stay on task</span>
+            </header>
+            <div class="chat-thread" id="chat-thread"></div>
+            <form id="chat-form">
+              <label class="visually-hidden" for="chat-input">Ask a question</label>
+              <textarea id="chat-input" rows="3" placeholder="Ask quick, focused questions"></textarea>
+              <button type="submit" class="cta">Send</button>
+            </form>
+          </section>
+        </div>
+      </main>
+
+      <section class="utility-panel">
+        <div class="utility-column">
+          <section class="card summarizer" aria-label="Note summarizer">
+            <header>
+              <h2>Note summarizer</h2>
+              <span class="hint">3–5 bullets</span>
+            </header>
+            <textarea id="summarizer-input" rows="6" placeholder="Paste text to condense"></textarea>
+            <button type="button" class="ghost" id="summarize-button">Summarize</button>
+            <ul id="summary-output" class="summary-output"></ul>
+          </section>
+        </div>
+        <div class="utility-column">
+          <section class="card notebook" aria-label="Notebook">
+            <header>
+              <h2>Notebook</h2>
+              <span class="hint">Autosaves</span>
+            </header>
+            <textarea id="notebook" rows="10" placeholder="Write notes without leaving focus"></textarea>
+            <div class="notebook-actions">
+              <button type="button" class="ghost" id="export-notes">Export</button>
+              <span class="muted" id="notebook-status">Saved</span>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <footer class="footer-bar">
+        <div>
+          <h3>Today's focus</h3>
+          <p><span id="stat-minutes">0</span> minutes focused • <span id="stat-sessions">0</span> sessions</p>
+        </div>
+        <div>
+          <h3>Coins</h3>
+          <p><span id="stat-coins">0</span> coins • Streak <span id="stat-streak">0</span> days</p>
+        </div>
+      </footer>
+    </div>
+
+    <dialog id="calculator-modal">
+      <form method="dialog" class="calculator-panel">
+        <header>
+          <h2>Calculator</h2>
+          <button type="submit" id="close-calculator" aria-label="Close calculator">×</button>
+        </header>
+        <output id="calculator-output">0</output>
+        <input id="calculator-input" type="text" inputmode="decimal" autocomplete="off" />
+        <div class="calculator-grid" id="calculator-buttons"></div>
+      </form>
+    </dialog>
+
+    <script type="module" src="./scripts/main.js"></script>
+  </body>
+</html>
